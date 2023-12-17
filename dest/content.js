@@ -15,30 +15,35 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
                 if (bigPlayButton) {
                     setTimeout(() => {
                         bigPlayButton.click();
+                    }, 300);
+                }
+                if (!progressBarDiv)
+                    return;
+                const sliderBarElement = progressBarDiv.querySelector(".vjs-slider-bar");
+                const progressBarW = getComputedStyle(progressBarDiv).getPropertyValue("width");
+                if (!sliderBarElement)
+                    return;
+                const sliderBarW = getComputedStyle(sliderBarElement).getPropertyValue("width");
+                if (progressBarW !== sliderBarW) {
+                    const videoParent = document.querySelector('[aria-label="Video Player"]');
+                    if (!videoParent)
+                        return;
+                    const videoElement = videoParent.querySelector("video");
+                    if (!videoElement || !videoElement.duration)
+                        return;
+                    setTimeout(() => {
+                        videoElement.currentTime = videoElement.duration;
+                        progressBarDiv.style.width = sliderBarW;
+                        const playProgresElem = progressBarDiv.querySelector(".vjs-play-progress.vjs-slider-bar");
+                        if (!playProgresElem)
+                            return;
+                        playProgresElem.style.width = "100%";
                     }, 1000);
                 }
-                if (progressBarDiv) {
-                    const sliderBarElement = progressBarDiv.querySelector(".vjs-slider-bar");
-                    const progressBarW = getComputedStyle(progressBarDiv).getPropertyValue("width");
-                    if (sliderBarElement) {
-                        const sliderBarW = getComputedStyle(sliderBarElement).getPropertyValue("width");
-                        if (progressBarW !== sliderBarW) {
-                            const videoElement = document.querySelector("video");
-                            if (videoElement && videoElement.duration) {
-                                videoElement.currentTime =
-                                    videoElement.duration;
-                                progressBarDiv.style.width = sliderBarW;
-                                const playProgresElem = progressBarDiv.querySelector(".vjs-play-progress.vjs-slider-bar");
-                                if (playProgresElem)
-                                    playProgresElem.style.width = "100%";
-                            }
-                        }
-                        else {
-                            const nextContentButton = document.querySelector('[aria-label="next content"]');
-                            if (nextContentButton)
-                                nextContentButton.click();
-                        }
-                    }
+                else {
+                    const nextContentButton = document.querySelector('[aria-label="next content"]');
+                    if (nextContentButton)
+                        nextContentButton.click();
                 }
             }, intervalT);
         }
